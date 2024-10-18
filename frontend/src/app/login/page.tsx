@@ -14,6 +14,7 @@ import postgres_logo from "@/public/images/postgresql-svgrepo-com.svg";
 import "../styles.css";
 
 import Logo from "@/public/images/anything-list-logo-full.png";
+import Link from "next/link";
 
 export default function SignUp() {
   const [email, setEmail] = useState("");
@@ -89,6 +90,9 @@ export default function SignUp() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
+        <span className="text-xs px-2">
+          Não possui uma conta? <Link className="text-[#ffd401]" href={"/cadastro"}>Cria sua conta</Link>{" "}
+        </span>
         <button
           type="submit"
           className="uppercase w-full justify-center text-sm md:max-w-[400px] md:text-base flex items-center gap-2 bg-[#ffd401] text-neutral-950 font-medium rounded-md px-4 py-2"
