@@ -13,7 +13,11 @@ export class CreateProdutoDto {
   @IsNotEmpty()
   description: string;
 
+  @IsString()
+  @IsNotEmpty()
+  imageUrl: string;
+
   @IsNumber()
   @IsNotEmpty()
-  userId: number; 
+  userId: number;
 }

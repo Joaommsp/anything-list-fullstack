@@ -14,6 +14,7 @@ export class ProdutoService {
         name: data.name,
         price: data.price,
         description: data.description,
+        imageUrl: data.imageUrl,
         user: {
           connect: {
             id: data.userId,
@@ -47,6 +48,7 @@ export class ProdutoService {
         name: updateProdutoDto.name,
         price: updateProdutoDto.price,
         description: updateProdutoDto.description,
+        imageUrl: updateProdutoDto.imageUrl,
       },
     });
   }

@@ -8,8 +8,8 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
+  id       Int       @id @default(autoincrement())
+  email    String    @unique
   password String
   produtos Produto[]
 }
@@ -19,6 +19,7 @@ model Produto {
   name        String
   price       Float
   description String
-  userId      Int   
-  user        User     @relation(fields: [userId], references: [id]) 
+  imageUrl    String
+  userId      Int
+  user        User   @relation(fields: [userId], references: [id])
 }

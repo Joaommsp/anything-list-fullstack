@@ -13,6 +13,7 @@ CREATE TABLE "Produto" (
     "name" TEXT NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "description" TEXT NOT NULL,
+    "imageUrl" TEXT NOT NULL,
     "userId" INTEGER NOT NULL,
 
     CONSTRAINT "Produto_pkey" PRIMARY KEY ("id")

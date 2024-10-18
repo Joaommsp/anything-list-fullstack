@@ -8,6 +8,9 @@ import {
   IconWashDrycleanOff,
 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
+import { storage } from "../../../services/firebase-service";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import Image from "next/image";
 
 export default function Produtos() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -15,10 +18,14 @@ export default function Produtos() {
     name: "",
     price: 0,
     description: "",
+    imageUrl: "",
     userId: parseInt(localStorage.getItem("userId") || "0"),
   });
   const [isUpdating, setIsUpdating] = useState(false);
   const [activeID, setActiveID] = useState<number | null>(null);
+  const [imgUrl, setImgUrl] = useState("");
+  const [progress, setProgress] = useState(0);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
@@ -65,43 +72,129 @@ export default function Produtos() {
       name: "",
       price: 0,
       description: "",
+      imageUrl: "",
       userId: parseInt(localStorage.getItem("userId") || "0"),
     });
   }
 
-  async function updateProduct(id: number | null) {
+  const handleUpload = (): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      if (!selectedFile) {
+        console.log("nenhum arquivo selecionado");
+        reject("Nenhum arquivo selecionado");
+        return;
+      }
+
+      const storageRef = ref(storage, `products-images/${selectedFile.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, selectedFile);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setProgress(progress);
+        },
+        (error) => {
+          console.error("Erro ao fazer upload do arquivo:", error);
+          reject(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref)
+            .then((url) => {
+              resolve(url);
+              createProduct(url);
+            })
+            .catch((error) => {
+              console.error("Erro ao obter a URL de download:", error);
+              reject(error);
+            });
+        }
+      );
+    });
+  };
+
+  const handleUpdate = (
+    id: number | null,
+    imageFile: File | null
+  ): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      if (imageFile != null) {
+        const storageRef = ref(storage, `products-images/${imageFile.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, imageFile);
+
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setProgress(progress);
+          },
+          (error) => {
+            console.error("Erro ao fazer upload do arquivo:", error);
+            reject(error);
+          },
+          () => {
+            getDownloadURL(uploadTask.snapshot.ref)
+              .then((url) => {
+                resolve(url);
+                updateProduct(id, url);
+              })
+              .catch((error) => {
+                console.error("Erro ao obter a URL de download:", error);
+                reject(error);
+              });
+          }
+        );
+      } else {
+        updateProduct(id, "");
+        resolve("");
+      }
+    });
+  };
+
+  async function updateProduct(id: number | null, newImageUrl: string) {
     if (activeID === null) return;
 
-    console.log(activeID);
+    const updatedProduct = {
+      ...product,
+      userId: parseInt(localStorage.getItem("userId") || "0"),
+    };
+
+    if (newImageUrl) {
+      updatedProduct.imageUrl = newImageUrl;
+    }
+
     await fetch(`http://localhost:3001/produtos/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        ...product,
-        userId: parseInt(localStorage.getItem("userId") || "0"),
-      }),
+      body: JSON.stringify(updatedProduct),
     });
 
     await getProducts();
   }
 
-  async function createProduct() {
+  async function createProduct(imageUrl: string) {
+    setSelectedFile(null);
     console.log(product);
     await fetch("http://localhost:3001/produtos", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(product),
+      body: JSON.stringify({ ...product, imageUrl: imageUrl }),
     });
+
     setProduct({
       name: "",
       price: 0,
       description: "",
+      imageUrl: "",
       userId: parseInt(localStorage.getItem("userId") || "0"),
     });
+
     await getProducts();
   }
 
@@ -120,6 +213,7 @@ export default function Produtos() {
       <table className="w-full border-collaps shadow-md">
         <thead>
           <tr className="bg-[#171717] text-white">
+            <th className="px-4 py-2 text-left font-medium"> </th>
             <th className="px-4 py-2 text-left font-medium">ID</th>
             <th className="px-4 py-2 text-left font-medium">Nome do produto</th>
             <th className="px-4 py-2 text-left font-medium">Descrição</th>
@@ -134,6 +228,15 @@ export default function Produtos() {
                 key={prod.id}
                 className="border-b border-gray-200 hover:bg-gray-800"
               >
+                <td className="px-4 py-2 text-sm flex justify-center">
+                  <Image
+                    src={prod.imageUrl}
+                    className="object-cover w-9 h-9 rounded-md"
+                    width={36}
+                    height={36}
+                    alt="..."
+                  />
+                </td>
                 <td className="px-4 py-2 text-sm">{prod.id}</td>
                 <td className="px-4 py-2 text-sm">{prod.name}</td>
                 <td className="px-4 py-2 text-sm">{prod.description}</td>
@@ -207,23 +310,21 @@ export default function Produtos() {
                 id="input-name"
                 className="outline-none text-xs rounded-md bg-neutral-900 text-gray-50 p-2 w-full"
                 type="file"
-                // onChange={(e) =>
-                //   setProduct({ ...product, price: +e.target.value })
-                // }
+                onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
               />
             </div>
           </div>
           <div className="flex  items-end gap-2">
             {isUpdating == true ? (
               <button
-                onClick={() => updateProduct(activeID)}
+                onClick={() => handleUpdate(activeID, selectedFile)}
                 className="flex items-center gap-2 bg-blue-500 text-neutral-950 font-semibold rounded-md px-4 py-2"
               >
                 <IconDeviceFloppy size={20} />
               </button>
             ) : (
               <button
-                onClick={createProduct}
+                onClick={() => handleUpload()}
                 className="flex items-center gap-2 bg-green-500 text-neutral-950 font-semibold rounded-md px-4 py-2"
               >
                 <IconDeviceFloppy size={20} />
