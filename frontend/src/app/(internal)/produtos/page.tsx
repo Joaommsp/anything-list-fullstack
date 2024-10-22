@@ -221,12 +221,12 @@ export default function Produtos() {
             <th className="px-4 py-2 text-left font-medium">Ações</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="w-full">
           {products.map((prod: Product) => (
             <>
               <tr
                 key={prod.id}
-                className="border-b border-gray-200 hover:bg-gray-800"
+                className="border-b border-gray-200 hover:bg-gray-800 w-full"
               >
                 <td className="px-4 py-2 text-sm flex justify-center">
                   <Image
@@ -239,7 +239,9 @@ export default function Produtos() {
                 </td>
                 <td className="px-4 py-2 text-sm">{prod.id}</td>
                 <td className="px-4 py-2 text-sm">{prod.name}</td>
-                <td className="px-4 py-2 text-sm">{prod.description}</td>
+                <td className="px-4 py-2 text-sm overflow-hidden text-ellipsis whitespace-nowrap max-w-[150px]">
+                  {prod.description}
+                </td>
                 <td className="px-4 py-2 text-sm">R${prod.price}</td>
                 <td className="px-4 py-2">
                   <div className="flex items-center gap-4">
