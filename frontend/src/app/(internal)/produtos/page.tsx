@@ -23,7 +23,6 @@ export default function Produtos() {
   });
   const [isUpdating, setIsUpdating] = useState(false);
   const [activeID, setActiveID] = useState<number | null>(null);
-  const [imgUrl, setImgUrl] = useState("");
   const [progress, setProgress] = useState(0);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -210,20 +209,25 @@ export default function Produtos() {
 
   function renderizeProducts() {
     return (
-      <table className="w-full border-collaps shadow-md">
-        <thead>
-          <tr className="bg-[#171717] text-white">
-            <th className="px-4 py-2 text-left font-medium"> </th>
-            <th className="px-4 py-2 text-left font-medium">ID</th>
-            <th className="px-4 py-2 text-left font-medium">Nome do produto</th>
-            <th className="px-4 py-2 text-left font-medium">Descrição</th>
-            <th className="px-4 py-2 text-left font-medium">Preço</th>
-            <th className="px-4 py-2 text-left font-medium">Ações</th>
-          </tr>
-        </thead>
-        <tbody className="w-full">
-          {products.map((prod: Product) => (
-            <>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse shadow-md min-w-[600px]">
+          <thead>
+            <tr className="bg-[#171717] text-white">
+              <th className="px-4 py-2 text-left font-medium"> </th>
+              <th className="px-4 py-2 text-left font-medium">ID</th>
+              <th className="px-4 py-2 text-left font-medium">
+                Nome do produto
+              </th>
+              <th className="hidden md:table-cell px-4 py-2 text-left font-medium">
+                Descrição
+              </th>{" "}
+              {/* Esconde descrição em telas menores */}
+              <th className="px-4 py-2 text-left font-medium">Preço</th>
+              <th className="px-4 py-2 text-left font-medium">Ações</th>
+            </tr>
+          </thead>
+          <tbody className="w-full">
+            {products.map((prod: Product) => (
               <tr
                 key={prod.id}
                 className="border-b border-gray-200 hover:bg-gray-800 w-full"
@@ -234,12 +238,12 @@ export default function Produtos() {
                     className="object-cover w-9 h-9 rounded-md"
                     width={36}
                     height={36}
-                    alt="..."
+                    alt="Imagem do Produto"
                   />
                 </td>
                 <td className="px-4 py-2 text-sm">{prod.id}</td>
                 <td className="px-4 py-2 text-sm">{prod.name}</td>
-                <td className="px-4 py-2 text-sm overflow-hidden text-ellipsis whitespace-nowrap max-w-[150px]">
+                <td className="hidden md:table-cell px-4 py-2 text-sm overflow-hidden text-ellipsis whitespace-nowrap max-w-[150px]">
                   {prod.description}
                 </td>
                 <td className="px-4 py-2 text-sm">R${prod.price}</td>
@@ -260,19 +264,19 @@ export default function Produtos() {
                   </div>
                 </td>
               </tr>
-            </>
-          ))}
-        </tbody>
-      </table>
+            ))}
+          </tbody>
+        </table>
+      </div>
     );
   }
 
   function renderizeForm() {
     return (
       <div className="w-full flex flex-col items-center mb-8 border-b-2 border-gray-600">
-        <div className="w-full mb-4 flex items-end justify-between gap-2">
-          <div className="w-full flex items-end justify-start gap-2">
-            <div className="flex flex-col ">
+        <div className="w-full mb-4 flex items-end justify-between gap-2 flex-wrap">
+          <div className="w-full flex items-end justify-start gap-2 flex-wrap">
+            <div className="flex flex-col w-full">
               <input
                 placeholder="Nome do item"
                 id="input-name"
@@ -284,7 +288,7 @@ export default function Produtos() {
                 }
               />
             </div>
-            <div className="flex flex-col ">
+            <div className="flex flex-col w-full">
               <input
                 placeholder="Descrição"
                 id="input-description"
@@ -296,7 +300,7 @@ export default function Produtos() {
                 }
               />
             </div>
-            <div className="flex flex-col ">
+            <div className="flex flex-col w-full">
               <input
                 id="input-name"
                 className="outline-none text-sm rounded-md bg-neutral-900 text-gray-50 p-2 w-full"
