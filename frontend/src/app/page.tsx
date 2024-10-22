@@ -20,14 +20,14 @@ export default function Home() {
       style={{
         backgroundImage: `url(${BackgroundImage.src})`
       }}
-      className="w-full bg-cover bg-center bg-no-repeat bg-opacity-10 md:p-0 min-h-[800px] md:min-h-[700px] flex items-center justify-center"
+      className="w-full  bg-cover bg-center bg-no-repeat bg-opacity-10 md:p-0 min-h-screen flex items-center justify-center"
     >
-      <div className="w-full h-full p-2 bg-[#00000090] md:p-0 min-h-[800px] md:min-h-[700px]">
+      <div className="w-full h-full p-2 bg-[#00000090] min-h-screen">
         <motion.div
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: "spring", stiffness: 50, damping: 20 }}
-          className="flex flex-col items-center pt-[100px]
+          className="flex h-full justify-center flex-col items-center pt-[200px]
         "
         >
           <Image
