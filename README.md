@@ -17,7 +17,7 @@
 
 ###
 
-<img src="./src/assets/images/defaultImagearticle.png" alt="logo">
+<img src="./public/images/MacBook Pro-1729604397029.jpeg" alt="...">
 <br/>
 
 > Aplicação de listagem de produtos fullstack com frontend usando NEXTJS e TailwindsCSS e backend com NESTJS, banco de dados Postgresql, autenticação com JWT Token e armazenamento de imagens na nuvem com Firebase.
